@@ -5,6 +5,7 @@ int main()
 {
     struct chess_board board;
     board_initialize(&board);
+    board_summarize(&board);
 
     struct chess_move move;
     while (parse_move(&move))

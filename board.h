@@ -1,6 +1,8 @@
 #ifndef APSC143__BOARD_H
 #define APSC143__BOARD_H
 
+#include "panic.h"
+#include <stdio.h>
 #define BOARD_SIZE 8
 
 enum chess_player
@@ -23,12 +25,13 @@ enum chess_piece
     PIECE_KING,
 };
 
-struct square {
+typedef struct square
+{
     enum chess_piece type;
     enum chess_player owner;
     int column;
     int row;
-};
+} square;
 
 // Gets a lowercase string denoting the piece type.
 const char *piece_string(enum chess_piece piece);
@@ -37,7 +40,6 @@ struct chess_board
 {
     enum chess_player next_move_player;
     struct square squares[BOARD_SIZE][BOARD_SIZE];
-
     // TODO: what other fields are needed?
 };
 
@@ -45,6 +47,7 @@ struct chess_move
 {
     enum chess_piece piece_type; // what type of piece
     enum chess_player player;    // who owns the move
+    struct square currentPosition;
     int targetRow, targetColumn;
     int previousRow, previousColumn;
 };
