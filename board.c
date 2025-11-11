@@ -314,7 +314,6 @@ void board_initialize(struct chess_board *board)
         for (int col = 0; col < BOARD_SIZE; col++)
         {
             board->squares[row][col].has_piece = false;
-            board->squares[row][col].piece = PIECE_PAWN;
             board->squares[row][col].owner = PLAYER_WHITE;
         }
     }
@@ -354,6 +353,48 @@ void board_initialize(struct chess_board *board)
 void board_complete_move(const struct chess_board *board, struct chess_move *move)
 {
     move->player = board->next_move_player;
+
+    if (move->is_castle)
+    {
+        if (move->castle_kingside)
+        {
+            if (move->player == PLAYER_WHITE)
+            {
+                move->from_row = 7;
+                move->from_col = 4;
+                move->to_row = 7;
+                move->to_col = 6;
+            }
+            else
+            {
+                move->from_row = 0;
+                move->from_col = 4;
+                move->to_row = 0;
+                move->to_col = 6;
+            }
+        }
+        else
+        {
+            if (move->player == PLAYER_WHITE)
+            {
+                move->from_row = 7;
+                move->from_col = 4;
+                move->to_row = 7;
+                move->to_col = 2;
+            }
+            else
+            {
+                move->from_row = 0;
+                move->from_col = 4;
+                move->to_row = 0;
+                move->to_col = 2;
+            }
+        }
+        move->piece_type = PIECE_KING;
+        move->is_capture = false;
+        move->is_promotion = false;
+        return;
+    }
 
     if (move->to_row < 0 || move->to_row >= BOARD_SIZE || move->to_col < 0 || move->to_col >= BOARD_SIZE)
     {
@@ -454,11 +495,7 @@ void board_complete_move(const struct chess_board *board, struct chess_move *mov
 
     if (move->piece_type == PIECE_PAWN)
     {
-        if (move->player == PLAYER_WHITE && move->to_row == 7)
-        {
-            move->is_promotion = true;
-        }
-        else if (move->player == PLAYER_BLACK && move->to_row == 0)
+        if ((move->player == PLAYER_WHITE && move->to_row == 0) || (move->player == PLAYER_BLACK && move->to_row == 7))
         {
             move->is_promotion = true;
         }
@@ -466,10 +503,6 @@ void board_complete_move(const struct chess_board *board, struct chess_move *mov
         {
             move->is_promotion = false;
         }
-    }
-    else
-    {
-        move->is_promotion = false;
     }
 }
 
@@ -488,7 +521,55 @@ void board_apply_move(struct chess_board *board, const struct chess_move *move)
         panicf("move completion error: %s %s to %c%c\n", player_string(move->player), piece_string(move->piece_type), 'a' + move->to_col, '1' + (8 - move->to_row - 1));
     }
 
-    *dst = *src;
+    if (move->is_castle)
+    {
+        if (move->castle_kingside)
+        {
+            struct square *rook_src;
+            struct square *rook_dst;
+            if (move->player == PLAYER_WHITE)
+            {
+                rook_src = &board->squares[7][7];
+                rook_dst = &board->squares[7][5];
+            }
+            else
+            {
+                rook_src = &board->squares[0][7];
+                rook_dst = &board->squares[0][5];
+            }
+
+            if (!rook_src->has_piece || rook_src->owner != move->player || rook_src->piece != PIECE_ROOK)
+            {
+                panicf("move completion error: %s %s to %c%c\n", player_string(move->player), piece_string(move->piece_type), 'a' + move->to_col, '1' + (8 - move->to_row - 1));
+            }
+
+            *rook_dst = *rook_src;
+            rook_src->has_piece = false;
+        }
+        else
+        {
+            struct square *rook_src;
+            struct square *rook_dst;
+            if (move->player == PLAYER_WHITE)
+            {
+                rook_src = &board->squares[7][0];
+                rook_dst = &board->squares[7][3];
+            }
+            else
+            {
+                rook_src = &board->squares[0][0];
+                rook_dst = &board->squares[0][3];
+            }
+
+            if (!rook_src->has_piece || rook_src->owner != move->player || rook_src->piece != PIECE_ROOK)
+            {
+                panicf("move completion error: %s %s to %c%c\n", player_string(move->player), piece_string(move->piece_type), 'a' + move->to_col, '1' + (8 - move->to_row - 1));
+            }
+
+            *rook_dst = *rook_src;
+            rook_src->has_piece = false;
+        }
+    }
 
     if (move->is_capture)
     {
@@ -498,6 +579,8 @@ void board_apply_move(struct chess_board *board, const struct chess_move *move)
     {
         printf("move completion: %s %s from %c%c to %c%c\n", player_string(move->player), piece_string(move->piece_type), 'a' + move->from_col, '1' + (8 - move->from_row - 1), 'a' + move->to_col, '1' + (8 - move->to_row - 1));
     }
+
+    *dst = *src;
 
     if (move->is_promotion)
     {
