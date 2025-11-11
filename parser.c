@@ -1,93 +1,26 @@
 #include "parser.h"
 #include <stdio.h>
-#include <ctype.h>
+#include "panic.h"
 
 bool parse_move(struct chess_move *move)
 {
-    char pieceChar = '\0';
-    char columnChar = '\0';
-    char rowChar = '\0';
+    char c;
 
+    // Get the first character of the move, ignoring any initial spaces.
     do
     {
-        pieceChar = getc(stdin);
-    } while (pieceChar == ' ');
+        c = getc(stdin);
+    } while (c == ' ');
 
-    if (pieceChar == '\n' || pieceChar == '\r')
+    // Check if we are at the end of input.
+    if (c == '\n' || c == '\r')
         return false;
 
-    if (isupper(pieceChar))
+    switch (c)
     {
-        switch (pieceChar)
-        {
-        case 'N':
-            move->piece_type = PIECE_KNIGHT;
-            break;
-        case 'B':
-            move->piece_type = PIECE_BISHOP;
-            break;
-        case 'R':
-            move->piece_type = PIECE_ROOK;
-            break;
-        case 'Q':
-            move->piece_type = PIECE_QUEEN;
-            break;
-        case 'K':
-            move->piece_type = PIECE_KING;
-            break;
-        default:
-            printf("Invalid piece letter in move.");
-        }
-        columnChar = getc(stdin);
-        rowChar = getc(stdin);
-    }
-    else
-    {
-        move->piece_type = PIECE_PAWN;
-        columnChar = pieceChar;
-        rowChar = getc(stdin);
-    }
-
-    switch (tolower(columnChar))
-    {
-    case 'a':
-        move->targetColumn = 0;
-        break;
-    case 'b':
-        move->targetColumn = 1;
-        break;
-    case 'c':
-        move->targetColumn = 2;
-        break;
-    case 'd':
-        move->targetColumn = 3;
-        break;
-    case 'e':
-        move->targetColumn = 4;
-        break;
-    case 'f':
-        move->targetColumn = 5;
-        break;
-    case 'g':
-        move->targetColumn = 6;
-        break;
-    case 'h':
-        move->targetColumn = 7;
-        break;
+    // TODO: parse the move, starting from the first character. You are free to
+    // start from this switch/case as a template or use a different approach.
     default:
-        printf("Invalid column letter in move.");
+        panicf("parse error at character '%c'\n", c);
     }
-
-    if (rowChar >= '1' && rowChar <= '8')
-    {
-        move->targetRow = (rowChar - '1');
-    }
-    else
-        printf("Invalid row number in move.");
-
-
-    int nextChar;
-    while ((nextChar = getc(stdin)) == ' ')
-
-    return true;
 }

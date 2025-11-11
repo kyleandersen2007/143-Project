@@ -8,10 +8,10 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/kyle/coding/c/Project_143/board.c" "CMakeFiles/chess-analysis.dir/board.c.o" "gcc" "CMakeFiles/chess-analysis.dir/board.c.o.d"
-  "/home/kyle/coding/c/Project_143/main.c" "CMakeFiles/chess-analysis.dir/main.c.o" "gcc" "CMakeFiles/chess-analysis.dir/main.c.o.d"
-  "/home/kyle/coding/c/Project_143/panic.c" "CMakeFiles/chess-analysis.dir/panic.c.o" "gcc" "CMakeFiles/chess-analysis.dir/panic.c.o.d"
-  "/home/kyle/coding/c/Project_143/parser.c" "CMakeFiles/chess-analysis.dir/parser.c.o" "gcc" "CMakeFiles/chess-analysis.dir/parser.c.o.d"
+  "/home/kyle/coding/c/143-Project/board.c" "CMakeFiles/chess-analysis.dir/board.c.o" "gcc" "CMakeFiles/chess-analysis.dir/board.c.o.d"
+  "/home/kyle/coding/c/143-Project/main.c" "CMakeFiles/chess-analysis.dir/main.c.o" "gcc" "CMakeFiles/chess-analysis.dir/main.c.o.d"
+  "/home/kyle/coding/c/143-Project/panic.c" "CMakeFiles/chess-analysis.dir/panic.c.o" "gcc" "CMakeFiles/chess-analysis.dir/panic.c.o.d"
+  "/home/kyle/coding/c/143-Project/parser.c" "CMakeFiles/chess-analysis.dir/parser.c.o" "gcc" "CMakeFiles/chess-analysis.dir/parser.c.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

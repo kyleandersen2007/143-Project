@@ -1,6 +1,6 @@
 CMakeFiles/chess-analysis.dir/panic.c.o: \
- /home/kyle/coding/c/Project_143/panic.c /usr/include/stdc-predef.h \
- /home/kyle/coding/c/Project_143/panic.h \
+ /home/kyle/coding/c/143-Project/panic.c /usr/include/stdc-predef.h \
+ /home/kyle/coding/c/143-Project/panic.h \
  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h /usr/include/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/features-time64.h \

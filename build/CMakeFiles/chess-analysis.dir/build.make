@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/kyle/coding/c/Project_143
+CMAKE_SOURCE_DIR = /home/kyle/coding/c/143-Project
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/kyle/coding/c/Project_143/build
+CMAKE_BINARY_DIR = /home/kyle/coding/c/143-Project/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/chess-analysis.dir/depend.make
@@ -70,60 +70,60 @@ include CMakeFiles/chess-analysis.dir/progress.make
 include CMakeFiles/chess-analysis.dir/flags.make
 
 CMakeFiles/chess-analysis.dir/main.c.o: CMakeFiles/chess-analysis.dir/flags.make
-CMakeFiles/chess-analysis.dir/main.c.o: /home/kyle/coding/c/Project_143/main.c
+CMakeFiles/chess-analysis.dir/main.c.o: /home/kyle/coding/c/143-Project/main.c
 CMakeFiles/chess-analysis.dir/main.c.o: CMakeFiles/chess-analysis.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kyle/coding/c/Project_143/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/chess-analysis.dir/main.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/chess-analysis.dir/main.c.o -MF CMakeFiles/chess-analysis.dir/main.c.o.d -o CMakeFiles/chess-analysis.dir/main.c.o -c /home/kyle/coding/c/Project_143/main.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kyle/coding/c/143-Project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/chess-analysis.dir/main.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/chess-analysis.dir/main.c.o -MF CMakeFiles/chess-analysis.dir/main.c.o.d -o CMakeFiles/chess-analysis.dir/main.c.o -c /home/kyle/coding/c/143-Project/main.c
 
 CMakeFiles/chess-analysis.dir/main.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/chess-analysis.dir/main.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kyle/coding/c/Project_143/main.c > CMakeFiles/chess-analysis.dir/main.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kyle/coding/c/143-Project/main.c > CMakeFiles/chess-analysis.dir/main.c.i
 
 CMakeFiles/chess-analysis.dir/main.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/chess-analysis.dir/main.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kyle/coding/c/Project_143/main.c -o CMakeFiles/chess-analysis.dir/main.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kyle/coding/c/143-Project/main.c -o CMakeFiles/chess-analysis.dir/main.c.s
 
 CMakeFiles/chess-analysis.dir/board.c.o: CMakeFiles/chess-analysis.dir/flags.make
-CMakeFiles/chess-analysis.dir/board.c.o: /home/kyle/coding/c/Project_143/board.c
+CMakeFiles/chess-analysis.dir/board.c.o: /home/kyle/coding/c/143-Project/board.c
 CMakeFiles/chess-analysis.dir/board.c.o: CMakeFiles/chess-analysis.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kyle/coding/c/Project_143/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/chess-analysis.dir/board.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/chess-analysis.dir/board.c.o -MF CMakeFiles/chess-analysis.dir/board.c.o.d -o CMakeFiles/chess-analysis.dir/board.c.o -c /home/kyle/coding/c/Project_143/board.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kyle/coding/c/143-Project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/chess-analysis.dir/board.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/chess-analysis.dir/board.c.o -MF CMakeFiles/chess-analysis.dir/board.c.o.d -o CMakeFiles/chess-analysis.dir/board.c.o -c /home/kyle/coding/c/143-Project/board.c
 
 CMakeFiles/chess-analysis.dir/board.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/chess-analysis.dir/board.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kyle/coding/c/Project_143/board.c > CMakeFiles/chess-analysis.dir/board.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kyle/coding/c/143-Project/board.c > CMakeFiles/chess-analysis.dir/board.c.i
 
 CMakeFiles/chess-analysis.dir/board.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/chess-analysis.dir/board.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kyle/coding/c/Project_143/board.c -o CMakeFiles/chess-analysis.dir/board.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kyle/coding/c/143-Project/board.c -o CMakeFiles/chess-analysis.dir/board.c.s
 
 CMakeFiles/chess-analysis.dir/parser.c.o: CMakeFiles/chess-analysis.dir/flags.make
-CMakeFiles/chess-analysis.dir/parser.c.o: /home/kyle/coding/c/Project_143/parser.c
+CMakeFiles/chess-analysis.dir/parser.c.o: /home/kyle/coding/c/143-Project/parser.c
 CMakeFiles/chess-analysis.dir/parser.c.o: CMakeFiles/chess-analysis.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kyle/coding/c/Project_143/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/chess-analysis.dir/parser.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/chess-analysis.dir/parser.c.o -MF CMakeFiles/chess-analysis.dir/parser.c.o.d -o CMakeFiles/chess-analysis.dir/parser.c.o -c /home/kyle/coding/c/Project_143/parser.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kyle/coding/c/143-Project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/chess-analysis.dir/parser.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/chess-analysis.dir/parser.c.o -MF CMakeFiles/chess-analysis.dir/parser.c.o.d -o CMakeFiles/chess-analysis.dir/parser.c.o -c /home/kyle/coding/c/143-Project/parser.c
 
 CMakeFiles/chess-analysis.dir/parser.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/chess-analysis.dir/parser.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kyle/coding/c/Project_143/parser.c > CMakeFiles/chess-analysis.dir/parser.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kyle/coding/c/143-Project/parser.c > CMakeFiles/chess-analysis.dir/parser.c.i
 
 CMakeFiles/chess-analysis.dir/parser.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/chess-analysis.dir/parser.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kyle/coding/c/Project_143/parser.c -o CMakeFiles/chess-analysis.dir/parser.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kyle/coding/c/143-Project/parser.c -o CMakeFiles/chess-analysis.dir/parser.c.s
 
 CMakeFiles/chess-analysis.dir/panic.c.o: CMakeFiles/chess-analysis.dir/flags.make
-CMakeFiles/chess-analysis.dir/panic.c.o: /home/kyle/coding/c/Project_143/panic.c
+CMakeFiles/chess-analysis.dir/panic.c.o: /home/kyle/coding/c/143-Project/panic.c
 CMakeFiles/chess-analysis.dir/panic.c.o: CMakeFiles/chess-analysis.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kyle/coding/c/Project_143/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/chess-analysis.dir/panic.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/chess-analysis.dir/panic.c.o -MF CMakeFiles/chess-analysis.dir/panic.c.o.d -o CMakeFiles/chess-analysis.dir/panic.c.o -c /home/kyle/coding/c/Project_143/panic.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kyle/coding/c/143-Project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/chess-analysis.dir/panic.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/chess-analysis.dir/panic.c.o -MF CMakeFiles/chess-analysis.dir/panic.c.o.d -o CMakeFiles/chess-analysis.dir/panic.c.o -c /home/kyle/coding/c/143-Project/panic.c
 
 CMakeFiles/chess-analysis.dir/panic.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/chess-analysis.dir/panic.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kyle/coding/c/Project_143/panic.c > CMakeFiles/chess-analysis.dir/panic.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kyle/coding/c/143-Project/panic.c > CMakeFiles/chess-analysis.dir/panic.c.i
 
 CMakeFiles/chess-analysis.dir/panic.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/chess-analysis.dir/panic.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kyle/coding/c/Project_143/panic.c -o CMakeFiles/chess-analysis.dir/panic.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kyle/coding/c/143-Project/panic.c -o CMakeFiles/chess-analysis.dir/panic.c.s
 
 # Object files for target chess-analysis
 chess__analysis_OBJECTS = \
@@ -141,7 +141,7 @@ chess-analysis: CMakeFiles/chess-analysis.dir/parser.c.o
 chess-analysis: CMakeFiles/chess-analysis.dir/panic.c.o
 chess-analysis: CMakeFiles/chess-analysis.dir/build.make
 chess-analysis: CMakeFiles/chess-analysis.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/kyle/coding/c/Project_143/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking C executable chess-analysis"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/kyle/coding/c/143-Project/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking C executable chess-analysis"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/chess-analysis.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -153,6 +153,6 @@ CMakeFiles/chess-analysis.dir/clean:
 .PHONY : CMakeFiles/chess-analysis.dir/clean
 
 CMakeFiles/chess-analysis.dir/depend:
-	cd /home/kyle/coding/c/Project_143/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/kyle/coding/c/Project_143 /home/kyle/coding/c/Project_143 /home/kyle/coding/c/Project_143/build /home/kyle/coding/c/Project_143/build /home/kyle/coding/c/Project_143/build/CMakeFiles/chess-analysis.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /home/kyle/coding/c/143-Project/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/kyle/coding/c/143-Project /home/kyle/coding/c/143-Project /home/kyle/coding/c/143-Project/build /home/kyle/coding/c/143-Project/build /home/kyle/coding/c/143-Project/build/CMakeFiles/chess-analysis.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/chess-analysis.dir/depend
 
