@@ -61,25 +61,23 @@ struct chess_move
     bool is_castle;
     bool castle_kingside;
 };
+const char *piece_string(enum chess_piece piece);
+const char *player_string(enum chess_player player);
 
-// Initializes the state of the board for a new chess game.
 void board_initialize(struct chess_board *board);
-
-// Determine which piece is moving, and complete the move data accordingly.
-// Panics if there is no piece which can make the specified move, or if there
-// are multiple possible pieces.
 void board_complete_move(const struct chess_board *board, struct chess_move *move);
-
-// Apply move to the board. The move must already be complete, i.e., the initial
-// square must be known. Panics if the move is not legal in the current board
-// position.
 void board_apply_move(struct chess_board *board, const struct chess_move *move);
+void board_summarize(const struct chess_board *board);
 
-// Classify the state of the board, printing one of the following:
-// - game incomplete
-// - white wins by checkmate
-// - black wins by checkmate
-// - draw by stalemate
-void board_summarize(const struct chess_board *board); // (stub for now)
+bool in_check(const struct chess_board *board, enum chess_player player);
+bool in_checkmate(const struct chess_board *board, enum chess_player player);
+bool pawn_reach(const struct chess_board *board, int from_row, int from_col, int to_row, int to_col, enum chess_player player);
+bool diag_check(const struct chess_board *board, int from_row, int from_col, int to_row, int to_col);
+bool straight_check(const struct chess_board *board, int from_row, int from_col, int to_row, int to_col);
+bool can_castle(const struct chess_board *board, enum chess_player player, bool kingside);
+bool in_stalemate(const struct chess_board * board, enum chess_player player);
+bool is_legal_move(const struct chess_board *board, int from_row, int from_col, int to_row, int to_col);
+
+bool board_find_best_move(const struct chess_board *board, struct chess_move *best_move_out);
 
 #endif

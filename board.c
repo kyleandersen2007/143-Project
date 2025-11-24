@@ -1,7 +1,6 @@
 #include "board.h"
 #include <stdio.h>
 
-// HELPER FUNCTIONS
 static inline int absint(int v)
 {
     return (v < 0) ? -v : v;
@@ -38,21 +37,21 @@ const char *piece_string(enum chess_piece piece)
     return "unknown";
 }
 
-static inline bool straight_check(const struct chess_board *board, int from_row_index, int from_column_index, int to_row_index, int to_column_index)
+bool straight_check(const struct chess_board *board, int from_row, int from_col, int to_row, int to_col)
 {
-    if (from_row_index == to_row_index && from_column_index == to_column_index)
+    if (from_row == to_row && from_col == to_col)
     {
         return false;
     }
 
-    if (from_row_index == to_row_index)
+    if (from_row == to_row)
     {
-        int step = (to_column_index > from_column_index) ? 1 : -1;
-        int column = from_column_index + step;
+        int step = (to_col > from_col) ? 1 : -1;
+        int column = from_col + step;
 
-        while (column != to_column_index)
+        while (column != to_col)
         {
-            if (board->squares[from_row_index][column].has_piece)
+            if (board->squares[from_row][column].has_piece)
                 return false;
             column += step;
         }
@@ -60,14 +59,14 @@ static inline bool straight_check(const struct chess_board *board, int from_row_
         return true;
     }
 
-    if (from_column_index == to_column_index)
+    if (from_col == to_col)
     {
-        int step = (to_row_index > from_row_index) ? 1 : -1;
-        int row = from_row_index + step;
+        int step = (to_row > from_row) ? 1 : -1;
+        int row = from_row + step;
 
-        while (row != to_row_index)
+        while (row != to_row)
         {
-            if (board->squares[row][from_column_index].has_piece)
+            if (board->squares[row][from_col].has_piece)
                 return false;
             row += step;
         }
@@ -77,10 +76,10 @@ static inline bool straight_check(const struct chess_board *board, int from_row_
     return false;
 }
 
-static inline bool diag_check(const struct chess_board *board, int from_row_index, int from_column_index, int to_row_index, int to_column_index)
+bool diag_check(const struct chess_board *board, int from_row, int from_col, int to_row, int to_col)
 {
-    int delta_row = to_row_index - from_row_index;
-    int delta_col = to_column_index - from_column_index;
+    int delta_row = to_row - from_row;
+    int delta_col = to_col - from_col;
     int abs_delta_row = absint(delta_row);
     int abs_delta_col = absint(delta_col);
 
@@ -99,10 +98,10 @@ static inline bool diag_check(const struct chess_board *board, int from_row_inde
 
     int row_step = (delta_row > 0) ? 1 : -1;
     int column_step = (delta_col > 0) ? 1 : -1;
-    int row = from_row_index + row_step;
-    int column = from_column_index + column_step;
+    int row = from_row + row_step;
+    int column = from_col + column_step;
 
-    while (row != to_row_index)
+    while (row != to_row)
     {
         if (board->squares[row][column].has_piece)
         {
@@ -115,34 +114,104 @@ static inline bool diag_check(const struct chess_board *board, int from_row_inde
     return true;
 }
 
-static inline bool pawn_reach(const struct chess_board *board, int from_row_index, int from_column_index, int to_row_index, int to_column_index, enum chess_player player)
+bool pawn_reach(const struct chess_board *board, int from_row, int from_col, int to_row, int to_col, enum chess_player player)
 {
     int forward_direction = (player == PLAYER_WHITE) ? -1 : +1;
     int start_row_index = (player == PLAYER_WHITE) ? 6 : 1;
 
-    int delta_row = to_row_index - from_row_index;
-    int delta_col = to_column_index - from_column_index;
+    int delta_row = to_row - from_row;
+    int delta_col = to_col - from_col;
 
     if (delta_row == forward_direction && (delta_col == 1 || delta_col == -1))
     {
-        const struct square *destination = &board->squares[to_row_index][to_column_index];
+        const struct square *destination = &board->squares[to_row][to_col];
         return destination->has_piece && destination->owner != player;
     }
     if (delta_col == 0 && delta_row == forward_direction)
     {
-        return !board->squares[to_row_index][to_column_index].has_piece;
+        return !board->squares[to_row][to_col].has_piece;
     }
 
-    if (delta_col == 0 && delta_row == 2 * forward_direction && from_row_index == start_row_index)
+    if (delta_col == 0 && delta_row == 2 * forward_direction && from_row == start_row_index)
     {
-        int intermediate_row = from_row_index + forward_direction;
-        return !board->squares[intermediate_row][from_column_index].has_piece && !board->squares[to_row_index][to_column_index].has_piece;
+        int intermediate_row = from_row + forward_direction;
+        return !board->squares[intermediate_row][from_col].has_piece && !board->squares[to_row][to_col].has_piece;
     }
 
     return false;
 }
 
-static inline bool in_check(const struct chess_board *board, enum chess_player player)
+bool is_legal_move(const struct chess_board *board, int from_row, int from_col, int to_row, int to_col)
+{
+    if (to_row < 0 || to_row >= BOARD_SIZE || to_col < 0 || to_col >= BOARD_SIZE)
+    {
+        return false;
+    }
+
+    const struct square *src = &board->squares[from_row][from_col];
+    if (!src->has_piece)
+    {
+        return false;
+    }
+
+    enum chess_player player = src->owner;
+    enum chess_piece piece = src->piece;
+
+    const struct square *dst = &board->squares[to_row][to_col];
+    if (dst->has_piece && dst->owner == player)
+    {
+        return false;
+    }
+
+    int delta_row = to_row - from_row;
+    int delta_col = to_col - from_col;
+    int absolute_delta_row = absint(delta_row);
+    int absolute_delta_col = absint(delta_col);
+
+    if (absolute_delta_row == 0 && absolute_delta_col == 0)
+    {
+        return false; // no “move”
+    }
+
+    bool is_legal = false;
+
+    switch (piece)
+    {
+    case PIECE_PAWN:
+        is_legal = pawn_reach(board, from_row, from_col, to_row, to_col, player);
+        break;
+
+    case PIECE_KNIGHT:
+        is_legal = (absolute_delta_row == 2 && absolute_delta_col == 1) || (absolute_delta_row == 1 && absolute_delta_col == 2);
+        break;
+
+    case PIECE_BISHOP:
+        if (absolute_delta_row == absolute_delta_col && absolute_delta_row != 0)
+        {
+            is_legal = diag_check(board, from_row, from_col, to_row, to_col);
+        }
+        break;
+
+    case PIECE_ROOK:
+        if ((delta_row == 0 && delta_col != 0) || (delta_col == 0 && delta_row != 0))
+        {
+            is_legal = straight_check(board, from_row, from_col, to_row, to_col);
+        }
+        break;
+
+    case PIECE_QUEEN:
+        is_legal = straight_check(board, from_row, from_col, to_row, to_col) || diag_check(board, from_row, from_col, to_row, to_col);
+        break;
+
+    case PIECE_KING:
+        is_legal = (absolute_delta_row <= 1 && absolute_delta_col <= 1 && (absolute_delta_row + absolute_delta_col) > 0);
+        break;
+    }
+
+    return is_legal;
+}
+
+bool in_check(const struct chess_board *board, enum chess_player player)
 {
     for (int row = 0; row < BOARD_SIZE; row++)
     {
@@ -166,47 +235,7 @@ static inline bool in_check(const struct chess_board *board, enum chess_player p
                         {
                             continue;
                         }
-
-                        int delta_row = king_row - from_row;
-                        int delta_col = king_col - from_col;
-                        int absolute_delta_row = absint(delta_row);
-                        int absolute_delta_col = absint(delta_col);
-
-                        bool can_reach = false;
-
-                        switch (source_square->piece)
-                        {
-                        case PIECE_PAWN:
-                            can_reach = pawn_reach(board, from_row, from_col, king_row, king_col, source_square->owner);
-                            break;
-
-                        case PIECE_KNIGHT:
-                            can_reach = (absolute_delta_row == 2 && absolute_delta_col == 1) || (absolute_delta_row == 1 && absolute_delta_col == 2);
-                            break;
-
-                        case PIECE_BISHOP:
-                            if (absolute_delta_row == absolute_delta_col && absolute_delta_row != 0)
-                            {
-                                can_reach = diag_check(board, from_row, from_col, king_row, king_col);
-                            }
-                            break;
-
-                        case PIECE_ROOK:
-                            if ((delta_row == 0 && delta_col != 0) || (delta_col == 0 && delta_row != 0))
-                            {
-                                can_reach = straight_check(board, from_row, from_col, king_row, king_col);
-                            }
-                            break;
-
-                        case PIECE_QUEEN:
-                            can_reach = straight_check(board, from_row, from_col, king_row, king_col) || diag_check(board, from_row, from_col, king_row, king_col);
-                            break;
-
-                        case PIECE_KING:
-                            can_reach = (absolute_delta_row <= 1 && absolute_delta_col <= 1 && (absolute_delta_row + absolute_delta_col) > 0);
-                            break;
-                        };
-                        if (can_reach)
+                        if (is_legal_move(board, from_row, from_col, king_row, king_col))
                         {
                             return true;
                         }
@@ -218,12 +247,13 @@ static inline bool in_check(const struct chess_board *board, enum chess_player p
     return false;
 }
 
-static inline bool in_checkmate(const struct chess_board *board, enum chess_player player)
+bool in_checkmate(const struct chess_board *board, enum chess_player player)
 {
     if (!in_check(board, player))
         return false;
 
     for (int from_row = 0; from_row < BOARD_SIZE; ++from_row)
+    {
         for (int from_col = 0; from_col < BOARD_SIZE; ++from_col)
         {
             const struct square *src = &board->squares[from_row][from_col];
@@ -238,41 +268,10 @@ static inline bool in_checkmate(const struct chess_board *board, enum chess_play
                     if (dst->has_piece && dst->owner == player)
                         continue;
 
-                    int delta_row = to_row - from_row;
-                    int delta_col = to_col - from_col;
-                    int absolute_delta_row = absint(delta_row);
-                    int absolute_delta_col = absint(delta_col);
-                    bool can_reach = false;
-
-                    switch (src->piece)
+                    if (!is_legal_move(board, from_row, from_col, to_row, to_col))
                     {
-                    case PIECE_PAWN:
-                        can_reach = pawn_reach(board, from_row, from_col, to_row, to_col, player);
-                        break;
-                    case PIECE_KNIGHT:
-                        can_reach = (absolute_delta_row == 2 && absolute_delta_col == 1) || (absolute_delta_row == 1 && absolute_delta_col == 2);
-                        break;
-                    case PIECE_BISHOP:
-                        if (absolute_delta_row == absolute_delta_col && absolute_delta_row != 0)
-                        {
-                            can_reach = diag_check(board, from_row, from_col, to_row, to_col);
-                        }
-                        break;
-                    case PIECE_ROOK:
-                        if ((delta_row == 0 && delta_col != 0) || (delta_col == 0 && delta_row != 0))
-                        {
-                            can_reach = straight_check(board, from_row, from_col, to_row, to_col);
-                        }
-                        break;
-                    case PIECE_QUEEN:
-                        can_reach = straight_check(board, from_row, from_col, to_row, to_col) || diag_check(board, from_row, from_col, to_row, to_col);
-                        break;
-                    case PIECE_KING:
-                        can_reach = (absolute_delta_row <= 1 && absolute_delta_col <= 1 && (absolute_delta_row + absolute_delta_col) > 0);
-                        break;
-                    }
-                    if (!can_reach)
                         continue;
+                    }
 
                     struct chess_move test_move;
 
@@ -283,8 +282,6 @@ static inline bool in_checkmate(const struct chess_board *board, enum chess_play
                     test_move.to_row = to_row;
                     test_move.to_col = to_col;
                     test_move.is_capture = (dst->has_piece && dst->owner != player);
-                    test_move.is_castle = false;
-                    test_move.is_promotion = false;
 
                     if (test_move.piece_type == PIECE_PAWN)
                     {
@@ -303,8 +300,136 @@ static inline bool in_checkmate(const struct chess_board *board, enum chess_play
                 }
             }
         }
+    }
 
     return true;
+}
+
+bool can_castle(const struct chess_board *board, enum chess_player player, bool kingside)
+{
+    int row = (player == PLAYER_WHITE) ? 7 : 0;
+
+    if (player == PLAYER_WHITE)
+    {
+        if (kingside && !board->rights.white_kingside)
+        {
+            return false;
+        }
+        if (!kingside && !board->rights.white_queenside)
+        {
+            return false;
+        }
+    }
+    else
+    {
+        if (kingside && !board->rights.black_kingside)
+        {
+            return false;
+        }
+        if (!kingside && !board->rights.black_queenside)
+        {
+            return false;
+        }
+    }
+
+    int king_from_col = 4;
+    int king_to_col = kingside ? 6 : 2;
+
+    int step = (king_to_col > king_from_col) ? 1 : -1;
+    for (int c = king_from_col + step; c != king_to_col; c += step)
+    {
+        if (board->squares[row][c].has_piece)
+            return false;
+    }
+
+    if (in_check(board, player))
+        return false;
+
+    struct chess_board test_board = *board;
+    struct chess_move test_move;
+    test_move.player = player;
+    test_move.piece_type = PIECE_KING;
+    test_move.is_castle = false;
+    test_move.is_capture = false;
+    test_move.is_promotion = false;
+
+    int king_col = king_from_col;
+    while (king_col != king_to_col)
+    {
+        int next_col = king_col + step;
+
+        test_move.from_row = row;
+        test_move.from_col = king_col;
+        test_move.to_row = row;
+        test_move.to_col = next_col;
+
+        board_apply_move(&test_board, &test_move); // keep checking moves until we finally castle
+
+        king_col = next_col;
+
+        if (in_check(&test_board, player))
+            return false;
+    }
+
+    return true;
+}
+
+bool in_stalemate(const struct chess_board *board, enum chess_player player)
+{
+    if (in_check(board, player))
+    {
+        return false;
+    }
+    for (int from_row = 0; from_row < BOARD_SIZE; ++from_row)
+    {
+        for (int from_col = 0; from_col < BOARD_SIZE; ++from_col)
+        {
+            const struct square *src = &board->squares[from_row][from_col];
+            if (!src->has_piece || src->owner != player)
+                continue;
+
+            for (int to_row = 0; to_row < BOARD_SIZE; ++to_row)
+            {
+                for (int to_col = 0; to_col < BOARD_SIZE; ++to_col)
+                {
+                    const struct square *dst = &board->squares[to_row][to_col];
+                    if (dst->has_piece && dst->owner == player)
+                        continue;
+
+                    if (!is_legal_move(board, from_row, from_col, to_row, to_col))
+                    {
+                        continue;
+                    }
+
+                    struct chess_move test_move;
+
+                    test_move.player = player,
+                    test_move.piece_type = src->piece,
+                    test_move.from_row = from_row;
+                    test_move.from_col = from_col;
+                    test_move.to_row = to_row;
+                    test_move.to_col = to_col;
+                    test_move.is_capture = (dst->has_piece && dst->owner != player);
+
+                    if (test_move.piece_type == PIECE_PAWN)
+                    {
+                        if ((player == PLAYER_WHITE && to_row == 0) || (player == PLAYER_BLACK && to_row == 7))
+                        {
+                            test_move.is_promotion = true;
+                        }
+                    }
+
+                    struct chess_board test = *board;
+                    board_apply_move(&test, &test_move);
+                    if (in_check(&test, player))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
 }
 
 void board_initialize(struct chess_board *board)
@@ -356,40 +481,13 @@ void board_complete_move(const struct chess_board *board, struct chess_move *mov
 
     if (move->is_castle)
     {
-        if (move->castle_kingside)
-        {
-            if (move->player == PLAYER_WHITE)
-            {
-                move->from_row = 7;
-                move->from_col = 4;
-                move->to_row = 7;
-                move->to_col = 6;
-            }
-            else
-            {
-                move->from_row = 0;
-                move->from_col = 4;
-                move->to_row = 0;
-                move->to_col = 6;
-            }
-        }
-        else
-        {
-            if (move->player == PLAYER_WHITE)
-            {
-                move->from_row = 7;
-                move->from_col = 4;
-                move->to_row = 7;
-                move->to_col = 2;
-            }
-            else
-            {
-                move->from_row = 0;
-                move->from_col = 4;
-                move->to_row = 0;
-                move->to_col = 2;
-            }
-        }
+        int row = (move->player == PLAYER_WHITE) ? 7 : 0;
+
+        move->from_row = row;
+        move->from_col = 4;
+        move->to_row = row;
+        move->to_col = move->castle_kingside ? 6 : 2;
+
         move->piece_type = PIECE_KING;
         move->is_capture = false;
         move->is_promotion = false;
@@ -405,9 +503,9 @@ void board_complete_move(const struct chess_board *board, struct chess_move *mov
         panicf("move completion error: %s %s to %c%c\n", player_string(move->player), piece_string(move->piece_type), 'a' + move->to_col, '1' + (8 - move->to_row - 1));
     }
 
-    int candidate_rows[16];
-    int candidate_cols[16];
-    int candidate_count = 0;
+    int possible_rows[16];
+    int possible_cols[16];
+    int possible_moves = 0;
 
     for (int from_row = 0; from_row < BOARD_SIZE; ++from_row)
     {
@@ -427,69 +525,31 @@ void board_complete_move(const struct chess_board *board, struct chess_move *mov
                 continue;
             }
 
-            int delta_row = move->to_row - from_row;
-            int delta_col = move->to_col - from_col;
-            int absolute_delta_row = absint(delta_row);
-            int absolute_delta_col = absint(delta_col);
-
-            bool can_reach = false;
-
-            switch (source_square->piece)
+            if (!is_legal_move(board, from_row, from_col, move->to_row, move->to_col))
             {
-            case PIECE_PAWN:
-                can_reach = pawn_reach(board, from_row, from_col, move->to_row, move->to_col, move->player);
-                break;
-
-            case PIECE_KNIGHT:
-                can_reach = (absolute_delta_row == 2 && absolute_delta_col == 1) || (absolute_delta_row == 1 && absolute_delta_col == 2);
-                break;
-
-            case PIECE_BISHOP:
-                if (absolute_delta_row == absolute_delta_col && absolute_delta_row != 0)
-                {
-                    can_reach = diag_check(board, from_row, from_col, move->to_row, move->to_col);
-                }
-                break;
-
-            case PIECE_ROOK:
-                if ((delta_row == 0 && delta_col != 0) || (delta_col == 0 && delta_row != 0))
-                {
-                    can_reach = straight_check(board, from_row, from_col, move->to_row, move->to_col);
-                }
-                break;
-
-            case PIECE_QUEEN:
-                can_reach = straight_check(board, from_row, from_col, move->to_row, move->to_col) || diag_check(board, from_row, from_col, move->to_row, move->to_col);
-                break;
-
-            case PIECE_KING:
-                can_reach = (absolute_delta_row <= 1 && absolute_delta_col <= 1 && (absolute_delta_row + absolute_delta_col) > 0);
-                break;
+                continue;
             }
 
-            if (!can_reach)
-                continue;
-
-            if (candidate_count < (int)(sizeof(candidate_rows) / sizeof(candidate_rows[0])))
+            if (possible_moves < (int)(sizeof(possible_rows) / sizeof(possible_rows[0])))
             {
-                candidate_rows[candidate_count] = from_row;
-                candidate_cols[candidate_count] = from_col;
-                candidate_count++;
+                possible_rows[possible_moves] = from_row;
+                possible_cols[possible_moves] = from_col;
+                possible_moves++;
             }
         }
     }
 
-    if (candidate_count == 0)
+    if (possible_moves == 0)
     {
         panicf("move completion error: %s %s to %c%c\n", player_string(move->player), piece_string(move->piece_type), 'a' + move->to_col, '1' + (8 - move->to_row - 1));
     }
-    else if (candidate_count > 1)
+    else if (possible_moves > 1)
     {
         panicf("parse error: ambiguous move\n");
     }
 
-    move->from_row = candidate_rows[0];
-    move->from_col = candidate_cols[0];
+    move->from_row = possible_rows[0];
+    move->from_col = possible_cols[0];
 
     move->is_capture = board->squares[move->to_row][move->to_col].has_piece && board->squares[move->to_row][move->to_col].owner != move->player;
 
@@ -523,61 +583,29 @@ void board_apply_move(struct chess_board *board, const struct chess_move *move)
 
     if (move->is_castle)
     {
+        int row = (move->player == PLAYER_WHITE) ? 7 : 0;
+
+        struct square *rook_src;
+        struct square *rook_dst;
+
         if (move->castle_kingside)
         {
-            struct square *rook_src;
-            struct square *rook_dst;
-            if (move->player == PLAYER_WHITE)
-            {
-                rook_src = &board->squares[7][7];
-                rook_dst = &board->squares[7][5];
-            }
-            else
-            {
-                rook_src = &board->squares[0][7];
-                rook_dst = &board->squares[0][5];
-            }
-
-            if (!rook_src->has_piece || rook_src->owner != move->player || rook_src->piece != PIECE_ROOK)
-            {
-                panicf("move completion error: %s %s to %c%c\n", player_string(move->player), piece_string(move->piece_type), 'a' + move->to_col, '1' + (8 - move->to_row - 1));
-            }
-
-            *rook_dst = *rook_src;
-            rook_src->has_piece = false;
+            rook_src = &board->squares[row][7];
+            rook_dst = &board->squares[row][5];
         }
         else
         {
-            struct square *rook_src;
-            struct square *rook_dst;
-            if (move->player == PLAYER_WHITE)
-            {
-                rook_src = &board->squares[7][0];
-                rook_dst = &board->squares[7][3];
-            }
-            else
-            {
-                rook_src = &board->squares[0][0];
-                rook_dst = &board->squares[0][3];
-            }
-
-            if (!rook_src->has_piece || rook_src->owner != move->player || rook_src->piece != PIECE_ROOK)
-            {
-                panicf("move completion error: %s %s to %c%c\n", player_string(move->player), piece_string(move->piece_type), 'a' + move->to_col, '1' + (8 - move->to_row - 1));
-            }
-
-            *rook_dst = *rook_src;
-            rook_src->has_piece = false;
+            rook_src = &board->squares[row][0];
+            rook_dst = &board->squares[row][3];
         }
-    }
 
-    if (move->is_capture)
-    {
-        printf("move completion: %s %s from %c%c captures on %c%c\n", player_string(move->player), piece_string(move->piece_type), 'a' + move->from_col, '1' + (8 - move->from_row - 1), 'a' + move->to_col, '1' + (8 - move->to_row - 1));
-    }
-    else
-    {
-        printf("move completion: %s %s from %c%c to %c%c\n", player_string(move->player), piece_string(move->piece_type), 'a' + move->from_col, '1' + (8 - move->from_row - 1), 'a' + move->to_col, '1' + (8 - move->to_row - 1));
+        if (!rook_src->has_piece || rook_src->owner != move->player || rook_src->piece != PIECE_ROOK)
+        {
+            panicf("move completion error: %s %s to %c%c\n", player_string(move->player), piece_string(move->piece_type), 'a' + move->to_col, '1' + (8 - move->to_row - 1));
+        }
+
+        *rook_dst = *rook_src;
+        rook_src->has_piece = false;
     }
 
     *dst = *src;
@@ -589,15 +617,6 @@ void board_apply_move(struct chess_board *board, const struct chess_move *move)
 
     src->has_piece = false;
 
-    if (in_check(board, (move->player == PLAYER_WHITE) ? PLAYER_BLACK : PLAYER_WHITE))
-    {
-        printf("%s is in check\n", player_string((move->player == PLAYER_WHITE) ? PLAYER_BLACK : PLAYER_WHITE));
-    }
-    if (in_checkmate(board, (move->player == PLAYER_WHITE) ? PLAYER_BLACK : PLAYER_WHITE))
-    {
-        printf("%s is in checkmate\n", player_string((move->player == PLAYER_WHITE) ? PLAYER_BLACK : PLAYER_WHITE));
-    }
-
     board->next_move_player = (board->next_move_player == PLAYER_WHITE) ? PLAYER_BLACK : PLAYER_WHITE;
 }
 
@@ -606,6 +625,14 @@ void board_summarize(const struct chess_board *board)
     if (in_checkmate(board, board->next_move_player))
     {
         printf("%s wins by checkmate\n", player_string((board->next_move_player == PLAYER_WHITE) ? PLAYER_BLACK : PLAYER_WHITE));
+    }
+    else if (in_stalemate(board, board->next_move_player))
+    {
+        printf("stalemate\n");
+    }
+    else if (in_check(board, (board->next_move_player == PLAYER_WHITE) ? PLAYER_BLACK : PLAYER_WHITE))
+    {
+        printf("%s is in check\n", player_string((board->next_move_player == PLAYER_WHITE) ? PLAYER_BLACK : PLAYER_WHITE));
     }
     else
     {

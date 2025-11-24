@@ -19,37 +19,13 @@ int main()
     struct chess_board board;
     board_initialize(&board);
 
-    // make_move(&board, PIECE_PAWN, 4, 4);
-    // make_move(&board, PIECE_PAWN, 4, 3);
-    // make_move(&board, PIECE_BISHOP, 2, 4);
-    // make_move(&board, PIECE_KNIGHT, 2, 2);
-    // make_move(&board, PIECE_QUEEN, 7, 3);
-    // make_move(&board, PIECE_KNIGHT, 5, 2);
-    // make_move(&board, PIECE_QUEEN, 5, 1);
-
-    // make_move(&board, PIECE_PAWN, 4, 4);
-    // make_move(&board, PIECE_PAWN, 4, 3);
-    // make_move(&board, PIECE_KNIGHT, 5, 5);
-    // make_move(&board, PIECE_PAWN, 3, 3);
-    // make_move(&board, PIECE_BISHOP, 2, 4);
-    // make_move(&board, PIECE_PAWN, 1, 2);
-
-    make_move(&board, PIECE_PAWN, 3, 4);
-    make_move(&board, PIECE_PAWN, 3, 3);
-    make_move(&board, PIECE_KNIGHT, 2, 5);
-    make_move(&board, PIECE_PAWN, 0, 3);
-    make_move(&board, PIECE_BISHOP, 5, 4);
-    make_move(&board, PIECE_PAWN, 0, 4);
-    make_move(&board, PIECE_QUEEN, 3, 5);
-    make_move(&board, PIECE_PAWN, 1, 2);
-    
-    struct chess_move castle_move = {
-        .piece_type = PIECE_KING,
-        .player = board.next_move_player,
-        .is_castle = true,
-        .castle_kingside = false};
-    board_complete_move(&board, &castle_move);
-    board_apply_move(&board, &castle_move);
+    make_move(&board, PIECE_PAWN, 4, 4);
+    make_move(&board, PIECE_PAWN, 4, 3);
+    make_move(&board, PIECE_BISHOP, 2, 4);
+    make_move(&board, PIECE_KNIGHT, 2, 2);
+    make_move(&board, PIECE_QUEEN, 7, 3);
+    make_move(&board, PIECE_KNIGHT, 5, 2);
+    make_move(&board, PIECE_QUEEN, 5, 1);
 
     board_summarize(&board);
 
