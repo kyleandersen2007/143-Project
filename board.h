@@ -61,6 +61,10 @@ struct chess_move
     bool is_castle;
     bool castle_kingside;
 };
+
+//stupid helper function because we can't use abs
+int get_absolute_value(int value);
+
 const char *piece_string(enum chess_piece piece);
 const char *player_string(enum chess_player player);
 
@@ -69,15 +73,14 @@ void board_complete_move(const struct chess_board *board, struct chess_move *mov
 void board_apply_move(struct chess_board *board, const struct chess_move *move);
 void board_summarize(const struct chess_board *board);
 
-bool in_check(const struct chess_board *board, enum chess_player player);
-bool in_checkmate(const struct chess_board *board, enum chess_player player);
-bool pawn_reach(const struct chess_board *board, int from_row, int from_col, int to_row, int to_col, enum chess_player player);
-bool diag_check(const struct chess_board *board, int from_row, int from_col, int to_row, int to_col);
-bool straight_check(const struct chess_board *board, int from_row, int from_col, int to_row, int to_col);
-bool can_castle(const struct chess_board *board, enum chess_player player, bool kingside);
-bool in_stalemate(const struct chess_board * board, enum chess_player player);
-bool is_legal_move(const struct chess_board *board, int from_row, int from_col, int to_row, int to_col);
-
-bool board_find_best_move(const struct chess_board *board, struct chess_move *best_move_out);
+bool board_in_check(const struct chess_board *board, enum chess_player player);
+bool board_in_checkmate(const struct chess_board *board, enum chess_player player);
+bool board_can_pawn_reach(const struct chess_board *board, int from_row, int from_col, int to_row, int to_col, enum chess_player player);
+bool board_diagonal_check(const struct chess_board *board, int from_row, int from_col, int to_row, int to_col);
+bool board_straight_check(const struct chess_board *board, int from_row, int from_col, int to_row, int to_col);
+bool board_can_castle(const struct chess_board *board, enum chess_player player, bool kingside);
+bool board_in_stalemate(const struct chess_board * board, enum chess_player player);
+bool board_is_legal_move(const struct chess_board *board, int from_row, int from_col, int to_row, int to_col);
+bool suggest_move(const struct chess_board *board, struct chess_move *best_move);
 
 #endif
