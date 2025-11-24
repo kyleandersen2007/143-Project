@@ -25,8 +25,6 @@ int main()
     make_move(&board, PIECE_PAWN, 3, 3);  // d5
     make_move(&board, PIECE_PAWN, 3, 3);  // exd5
     make_move(&board, PIECE_QUEEN, 3, 3); // Qxd5
-
-    make_move(&board, PIECE_PAWN, 0, 4); // a4
     // make_move(&board, PIECE_BISHOP, 3, 5); // Bd3
     // make_move(&board, PIECE_KNIGHT, 2, 2); // Nc6
     // make_move(&board, PIECE_KNIGHT, 5, 5); // Nf3

@@ -22,4 +22,9 @@ bool parse_move(struct chess_move *move)
     default:
         panicf("parse error at character '%c'\n", c);
     }
+
+    move->piece_type = PIECE_PAWN; // default to pawn for now
+    move->from_row = -1;
+    move->from_col = -1;
+    // to be implemented
 }
