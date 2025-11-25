@@ -6,7 +6,6 @@
 #include "panic.h"
 
 #define BOARD_SIZE 8
-#define PRINT_COORD(col, row) ('a' + (col)), ('1' + (8 - (row) - 1))
 
 enum chess_piece
 {
@@ -82,5 +81,6 @@ bool board_can_castle(const struct chess_board *board, bool kingside);
 bool board_in_stalemate(const struct chess_board *board);
 bool board_is_legal_move(const struct chess_board *board, int from_row, int from_col, int to_row, int to_col);
 void board_recommend_move(const struct chess_board *board, struct chess_move *best_move);
+int board_score_move(const struct chess_board *board, const struct chess_move *move);
 
 #endif

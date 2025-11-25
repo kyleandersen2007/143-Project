@@ -398,8 +398,6 @@ bool board_in_stalemate(const struct chess_board *board)
 bool board_can_castle(const struct chess_board *board, bool kingside)
 {
     int row = (board->next_move_player == PLAYER_WHITE) ? 7 : 0;
-
-    // Check castling rights
     if (board->next_move_player == PLAYER_WHITE)
     {
         if (kingside && !board->rights.white_kingside)
@@ -419,18 +417,21 @@ bool board_can_castle(const struct chess_board *board, bool kingside)
     int rook_col = kingside ? 7 : 0;
     int king_to_col = kingside ? 6 : 2;
 
-    // Ensure king and rook are present and belong to the side to move
     const struct square *king_square = &board->squares[row][king_from_col];
     const struct square *rook_square = &board->squares[row][rook_col];
 
-    if (!king_square->has_piece || king_square->owner != board->next_move_player || king_square->piece != PIECE_KING)
+    if (!king_square->has_piece ||
+        king_square->owner != board->next_move_player ||
+        king_square->piece != PIECE_KING)
     {
         return false;
     }
+
     if (!rook_square->has_piece || rook_square->owner != board->next_move_player || rook_square->piece != PIECE_ROOK)
     {
         return false;
     }
+
     if (kingside)
     {
         if (board->squares[row][5].has_piece || board->squares[row][6].has_piece)
@@ -473,6 +474,8 @@ bool board_can_castle(const struct chess_board *board, bool kingside)
 
         board_apply_move(&test_board, &test_move);
 
+        // board_apply_move flips next_move_player;
+        // we want to check the king that just moved.
         test_board.next_move_player = test_move.player;
 
         king_col = next_col;
@@ -540,6 +543,11 @@ void board_complete_move(const struct chess_board *board, struct chess_move *mov
 
     if (move->is_castle)
     {
+        if (!board_can_castle(board, move->castle_kingside))
+        {
+            panicf("move completion error: illegal castling by %s\n", player_string(move->player));
+        }
+
         int row = (move->player == PLAYER_WHITE) ? 7 : 0;
 
         move->from_row = row;
@@ -550,6 +558,7 @@ void board_complete_move(const struct chess_board *board, struct chess_move *mov
         move->piece_type = PIECE_KING;
         move->is_capture = false;
         move->is_promotion = false;
+
         return;
     }
 
@@ -632,6 +641,10 @@ void board_complete_move(const struct chess_board *board, struct chess_move *mov
 void board_apply_move(struct chess_board *board, const struct chess_move *move)
 {
     // if the move is out of bounds we panic
+    if (board_in_check(board))
+    {
+        panicf("illegal move: %s %s to %c%c\n", player_string(move->player), piece_string(move->piece_type), 'a' + move->to_col, '1' + (8 - move->to_row - 1));
+    }
     if (move->from_row < 0 || move->from_row >= BOARD_SIZE || move->from_col < 0 || move->from_col >= BOARD_SIZE || move->to_row < 0 || move->to_row >= BOARD_SIZE || move->to_col < 0 || move->to_col >= BOARD_SIZE)
     {
         panicf("move completion error: %s %s to %c%c\n", player_string(move->player), piece_string(move->piece_type), 'a' + move->to_col, '1' + (8 - move->to_row - 1));
@@ -686,6 +699,68 @@ void board_apply_move(struct chess_board *board, const struct chess_move *move)
     board->next_move_player = (board->next_move_player == PLAYER_WHITE) ? PLAYER_BLACK : PLAYER_WHITE; // switch the next move player
 }
 
+int board_score_move(const struct chess_board *board, const struct chess_move *move)
+{
+    int score = 0;
+
+    if (move->piece_type == PIECE_KING && !move->is_castle)
+    {
+        score -= 20;
+    }
+    if (move->is_castle)
+    {
+        score += 1000;
+    }
+
+    // capturing a piece affects the suggested move
+    if (move->is_capture)
+    {
+        const struct square *dst = &board->squares[move->to_row][move->to_col];
+        switch (dst->piece)
+        {
+        case PIECE_PAWN:
+            score += 100;
+            break;
+        case PIECE_KNIGHT:
+            score += 300;
+            break;
+        case PIECE_BISHOP:
+            score += 300;
+            break;
+        case PIECE_ROOK:
+            score += 500;
+            break;
+        case PIECE_QUEEN:
+            score += 900;
+            break;
+        case PIECE_KING:
+            score += 10000;
+            break;
+        }
+    }
+    // center advantage
+    if ((move->to_row == 3 || move->to_row == 4) && (move->to_col == 3 || move->to_col == 4))
+    {
+        score += 30;
+    }
+    // moving pawns forward
+    if (move->piece_type == PIECE_PAWN)
+    {
+        int direction = (move->player == PLAYER_WHITE) ? (7 - move->to_row) : move->to_row;
+        score += direction * 5;
+    }
+    // getting ur knights and bishops in the game
+    if (move->piece_type == PIECE_KNIGHT || move->piece_type == PIECE_BISHOP)
+    {
+        int start_row = (move->player == PLAYER_WHITE) ? 7 : 0;
+        if (move->from_row == start_row)
+        {
+            score += 20;
+        }
+    }
+    return score;
+}
+
 void board_recommend_move(const struct chess_board *board, struct chess_move *recommended_move)
 {
     bool can_make_safe_move = false;
@@ -694,11 +769,15 @@ void board_recommend_move(const struct chess_board *board, struct chess_move *re
     bool legal_move_exists = false;
     struct chess_move legal_move = {0};
 
+    int score_legal = -100000;
+    int best_safe_score = -100000;
+    // function is o(n^8) but whatever for now
     for (int from_row = 0; from_row < BOARD_SIZE; from_row++)
     {
         for (int from_col = 0; from_col < BOARD_SIZE; from_col++)
         {
             const struct square *src = &board->squares[from_row][from_col];
+
             if (!src->has_piece || src->owner != board->next_move_player)
             {
                 continue;
@@ -709,6 +788,7 @@ void board_recommend_move(const struct chess_board *board, struct chess_move *re
                 for (int to_col = 0; to_col < BOARD_SIZE; to_col++)
                 {
                     const struct square *dst = &board->squares[to_row][to_col];
+
                     if (dst->has_piece && dst->owner == board->next_move_player)
                     {
                         continue;
@@ -719,7 +799,9 @@ void board_recommend_move(const struct chess_board *board, struct chess_move *re
                         continue;
                     }
 
-                    struct chess_move move = {0};
+                    struct chess_move move = {0}; // anti garbage
+
+                    // a potential oversight: we never check for castling here
 
                     move.player = board->next_move_player;
                     move.piece_type = src->piece;
@@ -749,9 +831,10 @@ void board_recommend_move(const struct chess_board *board, struct chess_move *re
                     {
                         continue;
                     }
-
-                    if (!legal_move_exists)
+                    int current_move_score = board_score_move(board, &move);
+                    if (!legal_move_exists || current_move_score > score_legal)
                     {
+                        score_legal = current_move_score;
                         legal_move = move;
                         legal_move_exists = true;
                     }
@@ -809,11 +892,11 @@ void board_recommend_move(const struct chess_board *board, struct chess_move *re
                                         if ((enemy_move.player == PLAYER_WHITE && enemy_to_row == 0) || (enemy_move.player == PLAYER_BLACK && enemy_to_row == 7))
                                         {
                                             enemy_move.is_promotion = true;
-                                            enemy_move.promo_piece = PIECE_QUEEN;
+                                            enemy_move.promo_piece = PIECE_QUEEN; // lets just promote to the queen to simplify
                                         }
                                     }
 
-                                    struct chess_board reply = enemy_board;
+                                    struct chess_board reply = enemy_board; // Simulate enemy move on a copy to test for checkmate
                                     board_apply_move(&reply, &enemy_move);
 
                                     reply.next_move_player = enemy_move.player;
@@ -833,10 +916,14 @@ void board_recommend_move(const struct chess_board *board, struct chess_move *re
                         }
                     }
 
-                    if (!enemy_mate && !can_make_safe_move)
+                    if (!enemy_mate)
                     {
-                        safe_move = move;
-                        can_make_safe_move = true;
+                        if (!can_make_safe_move || current_move_score > best_safe_score)
+                        {
+                            can_make_safe_move = true;
+                            best_safe_score = current_move_score;
+                            safe_move = move;
+                        }
                     }
                 }
             }
@@ -857,19 +944,68 @@ void board_recommend_move(const struct chess_board *board, struct chess_move *re
     }
 }
 
+void board_print(const struct chess_board *board)
+{
+    printf("\n   a b c d e f g h\n");
+    printf("  -----------------\n");
+
+    for (int row = 0; row < 8; row++)
+    {
+        printf("%d| ", 8 - row);
+
+        for (int col = 0; col < 8; col++)
+        {
+            struct square sq = board->squares[row][col];
+            char c = '.';
+
+            if (sq.has_piece)
+            {
+                switch (sq.piece)
+                {
+                case PIECE_PAWN:
+                    c = 'p';
+                    break;
+                case PIECE_KNIGHT:
+                    c = 'n';
+                    break;
+                case PIECE_BISHOP:
+                    c = 'b';
+                    break;
+                case PIECE_ROOK:
+                    c = 'r';
+                    break;
+                case PIECE_QUEEN:
+                    c = 'q';
+                    break;
+                case PIECE_KING:
+                    c = 'k';
+                    break;
+                }
+
+                if (sq.owner == PLAYER_WHITE)
+                    c = c - 'a' + 'A';
+            }
+
+            printf("%c ", c);
+        }
+
+        printf("|%d\n", 8 - row);
+    }
+
+    printf("  -----------------\n");
+    printf("   a b c d e f g h\n\n");
+}
+
 void board_summarize(const struct chess_board *board)
 {
+    board_print(board);
     if (board_in_checkmate(board))
     {
         printf("%s wins by checkmate\n", player_string(board->next_move_player));
     }
     else if (board_in_stalemate(board))
     {
-        printf("stalemate\n");
-    }
-    else if (board_in_check(board))
-    {
-        printf("%s is in check\n", player_string(board->next_move_player));
+        printf("draw by stalemate\n");
     }
     else
     {
