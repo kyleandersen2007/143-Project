@@ -71,7 +71,6 @@ void board_initialize(struct chess_board *board);
 void board_complete_move(const struct chess_board *board, struct chess_move *move);
 void board_apply_move(struct chess_board *board, const struct chess_move *move);
 void board_summarize(const struct chess_board *board);
-
 bool board_in_check(const struct chess_board *board);
 bool board_in_checkmate(const struct chess_board *board);
 bool board_can_pawn_reach(const enum chess_player player, const struct chess_board *board, int from_row, int from_col, int to_row, int to_col);
@@ -81,6 +80,7 @@ bool board_can_castle(const struct chess_board *board, bool kingside);
 bool board_in_stalemate(const struct chess_board *board);
 bool board_is_legal_move(const struct chess_board *board, int from_row, int from_col, int to_row, int to_col);
 void board_recommend_move(const struct chess_board *board, struct chess_move *best_move);
+void board_print(const struct chess_board *board);
 int board_score_move(const struct chess_board *board, const struct chess_move *move);
 
 #endif

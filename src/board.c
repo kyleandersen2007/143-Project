@@ -690,11 +690,6 @@ void board_complete_move(const struct chess_board *board, struct chess_move *mov
 
 void board_apply_move(struct chess_board *board, const struct chess_move *move)
 {
-    // if the move is out of bounds we panic
-    // if (board_in_check(board))
-    // {
-    //     panicf("illegal move: %s %s to %c%c\n", player_string(move->player), piece_string(move->piece_type), 'a' + move->to_col, '1' + (8 - move->to_row - 1));
-    // }
     if (move->from_row < 0 || move->from_row >= BOARD_SIZE || move->from_col < 0 || move->from_col >= BOARD_SIZE || move->to_row < 0 || move->to_row >= BOARD_SIZE || move->to_col < 0 || move->to_col >= BOARD_SIZE)
     {
         panicf("move completion error: %s %s to %c%c\n", player_string(move->player), piece_string(move->piece_type), 'a' + move->to_col, '1' + (8 - move->to_row - 1));
@@ -850,9 +845,6 @@ void board_recommend_move(const struct chess_board *board, struct chess_move *re
                     }
 
                     struct chess_move move = {0}; // anti garbage
-
-                    // a potential oversight: we never check for castling here
-
                     move.player = board->next_move_player;
                     move.piece_type = src->piece;
                     move.from_row = from_row;
@@ -1011,28 +1003,52 @@ void board_print(const struct chess_board *board)
             {
                 const char *p = ".";
 
-                if (sq.owner == PLAYER_BLACK)
+                if (sq.owner == PLAYER_WHITE)
                 {
                     switch (sq.piece)
                     {
-                        case PIECE_KING:   p = "♔"; break;
-                        case PIECE_QUEEN:  p = "♕"; break;
-                        case PIECE_ROOK:   p = "♖"; break;
-                        case PIECE_BISHOP: p = "♗"; break;
-                        case PIECE_KNIGHT: p = "♘"; break;
-                        case PIECE_PAWN:   p = "♙"; break;
+                    case PIECE_KING:
+                        p = "♔";
+                        break;
+                    case PIECE_QUEEN:
+                        p = "♕";
+                        break;
+                    case PIECE_ROOK:
+                        p = "♖";
+                        break;
+                    case PIECE_BISHOP:
+                        p = "♗";
+                        break;
+                    case PIECE_KNIGHT:
+                        p = "♘";
+                        break;
+                    case PIECE_PAWN:
+                        p = "♙";
+                        break;
                     }
                 }
                 else
                 {
                     switch (sq.piece)
                     {
-                        case PIECE_KING:   p = "♚"; break;
-                        case PIECE_QUEEN:  p = "♛"; break;
-                        case PIECE_ROOK:   p = "♜"; break;
-                        case PIECE_BISHOP: p = "♝"; break;
-                        case PIECE_KNIGHT: p = "♞"; break;
-                        case PIECE_PAWN:   p = "♟"; break;
+                    case PIECE_KING:
+                        p = "♚";
+                        break;
+                    case PIECE_QUEEN:
+                        p = "♛";
+                        break;
+                    case PIECE_ROOK:
+                        p = "♜";
+                        break;
+                    case PIECE_BISHOP:
+                        p = "♝";
+                        break;
+                    case PIECE_KNIGHT:
+                        p = "♞";
+                        break;
+                    case PIECE_PAWN:
+                        p = "♟";
+                        break;
                     }
                 }
 
