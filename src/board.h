@@ -32,8 +32,8 @@ struct square
 
 struct castling_rights
 {
-    bool white_kingside;  // O-O
-    bool white_queenside; // O-O-O
+    bool white_kingside;
+    bool white_queenside;
     bool black_kingside;
     bool black_queenside;
 };
@@ -41,8 +41,8 @@ struct castling_rights
 struct chess_board
 {
     enum chess_player next_move_player;
-    struct square squares[BOARD_SIZE][BOARD_SIZE];
     struct castling_rights rights;
+    struct square squares[BOARD_SIZE][BOARD_SIZE];
 };
 
 struct chess_move
@@ -80,7 +80,6 @@ bool board_can_castle(const struct chess_board *board, bool kingside);
 bool board_in_stalemate(const struct chess_board *board);
 bool board_is_legal_move(const struct chess_board *board, int from_row, int from_col, int to_row, int to_col);
 void board_recommend_move(const struct chess_board *board, struct chess_move *best_move);
-void board_print(const struct chess_board *board);
 int board_score_move(const struct chess_board *board, const struct chess_move *move);
 
 #endif

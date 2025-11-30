@@ -29,48 +29,6 @@ const char *piece_string(enum chess_piece piece)
     case PIECE_KING:
         return "king";
     }
-    return "unknown";
-}
-
-const char *unicode_piece(enum chess_piece piece, enum chess_player owner)
-{
-    if (owner == PLAYER_WHITE)
-    {
-        switch (piece)
-        {
-        case PIECE_KING:
-            return "♔";
-        case PIECE_QUEEN:
-            return "♕";
-        case PIECE_ROOK:
-            return "♖";
-        case PIECE_BISHOP:
-            return "♗";
-        case PIECE_KNIGHT:
-            return "♘";
-        case PIECE_PAWN:
-            return "♙";
-        }
-    }
-    else
-    {
-        switch (piece)
-        {
-        case PIECE_KING:
-            return "♚";
-        case PIECE_QUEEN:
-            return "♛";
-        case PIECE_ROOK:
-            return "♜";
-        case PIECE_BISHOP:
-            return "♝";
-        case PIECE_KNIGHT:
-            return "♞";
-        case PIECE_PAWN:
-            return "♟";
-        }
-    }
-    return ".";
 }
 
 int get_absolute_value(int value)
@@ -442,16 +400,24 @@ bool board_can_castle(const struct chess_board *board, bool kingside)
     if (board->next_move_player == PLAYER_WHITE)
     {
         if (kingside && !board->rights.white_kingside)
+        {
             return false;
+        }
         if (!kingside && !board->rights.white_queenside)
+        {
             return false;
+        }
     }
     else
     {
         if (kingside && !board->rights.black_kingside)
+        {   
             return false;
+        }
         if (!kingside && !board->rights.black_queenside)
+        {
             return false;
+        }
     }
 
     int king_from_col = 4;
@@ -461,9 +427,7 @@ bool board_can_castle(const struct chess_board *board, bool kingside)
     const struct square *king_square = &board->squares[row][king_from_col];
     const struct square *rook_square = &board->squares[row][rook_col];
 
-    if (!king_square->has_piece ||
-        king_square->owner != board->next_move_player ||
-        king_square->piece != PIECE_KING)
+    if (!king_square->has_piece || king_square->owner != board->next_move_player || king_square->piece != PIECE_KING)
     {
         return false;
     }
@@ -541,6 +505,13 @@ void board_initialize(struct chess_board *board)
             board->squares[row][col].owner = PLAYER_WHITE; // useless but whatever. we use the has_piece flag to check for empty squares
         }
     }
+
+    // pawns
+    for (int col = 0; col < 8; col++)
+    {
+        board->squares[1][col] = (struct square){true, PIECE_PAWN, PLAYER_BLACK};
+        board->squares[6][col] = (struct square){true, PIECE_PAWN, PLAYER_WHITE};
+    }
     // initialize black pieces
     board->squares[0][0] = (struct square){true, PIECE_ROOK, PLAYER_BLACK};
     board->squares[0][1] = (struct square){true, PIECE_KNIGHT, PLAYER_BLACK};
@@ -551,13 +522,7 @@ void board_initialize(struct chess_board *board)
     board->squares[0][6] = (struct square){true, PIECE_KNIGHT, PLAYER_BLACK};
     board->squares[0][7] = (struct square){true, PIECE_ROOK, PLAYER_BLACK};
 
-    // pawns
-    for (int col = 0; col < 8; col++)
-    {
-        board->squares[1][col] = (struct square){true, PIECE_PAWN, PLAYER_BLACK};
-        board->squares[6][col] = (struct square){true, PIECE_PAWN, PLAYER_WHITE};
-    }
-
+    
     // initialize white pieces
     board->squares[7][0] = (struct square){true, PIECE_ROOK, PLAYER_WHITE};
     board->squares[7][1] = (struct square){true, PIECE_KNIGHT, PLAYER_WHITE};
@@ -570,12 +535,6 @@ void board_initialize(struct chess_board *board)
 
     // set next move player
     board->next_move_player = PLAYER_WHITE;
-
-    // set castling rights (MIGHT REMOVED)
-    board->rights.white_kingside = true;
-    board->rights.white_queenside = true;
-    board->rights.black_kingside = true;
-    board->rights.black_queenside = true;
 }
 
 void board_complete_move(const struct chess_board *board, struct chess_move *move)
@@ -1038,87 +997,6 @@ void board_recommend_move(const struct chess_board *board, struct chess_move *re
     {
         panicf("move completion error: no legal moves\n");
     }
-}
-
-void board_print(const struct chess_board *board)
-{
-    printf("\n   a b c d e f g h\n");
-    printf("  -----------------\n");
-
-    for (int row = 0; row < 8; row++)
-    {
-        printf("%d| ", 8 - row);
-
-        for (int col = 0; col < 8; col++)
-        {
-            const struct square sq = board->squares[row][col];
-
-            if (sq.has_piece)
-            {
-                const char *p = ".";
-
-                if (sq.owner == PLAYER_WHITE)
-                {
-                    switch (sq.piece)
-                    {
-                    case PIECE_KING:
-                        p = "♔";
-                        break;
-                    case PIECE_QUEEN:
-                        p = "♕";
-                        break;
-                    case PIECE_ROOK:
-                        p = "♖";
-                        break;
-                    case PIECE_BISHOP:
-                        p = "♗";
-                        break;
-                    case PIECE_KNIGHT:
-                        p = "♘";
-                        break;
-                    case PIECE_PAWN:
-                        p = "♙";
-                        break;
-                    }
-                }
-                else
-                {
-                    switch (sq.piece)
-                    {
-                    case PIECE_KING:
-                        p = "♚";
-                        break;
-                    case PIECE_QUEEN:
-                        p = "♛";
-                        break;
-                    case PIECE_ROOK:
-                        p = "♜";
-                        break;
-                    case PIECE_BISHOP:
-                        p = "♝";
-                        break;
-                    case PIECE_KNIGHT:
-                        p = "♞";
-                        break;
-                    case PIECE_PAWN:
-                        p = "♟";
-                        break;
-                    }
-                }
-
-                printf("%s ", p);
-            }
-            else
-            {
-                printf(". ");
-            }
-        }
-
-        printf("|%d\n", 8 - row);
-    }
-
-    printf("  -----------------\n");
-    printf("   a b c d e f g h\n\n");
 }
 
 void board_summarize(const struct chess_board *board)
