@@ -11,7 +11,6 @@ int main()
     {
         board_complete_move(&board, &move);
         board_apply_move(&board, &move);
-        board_print(&board);
     }
 
     board_summarize(&board);

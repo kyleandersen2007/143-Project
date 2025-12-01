@@ -577,9 +577,9 @@ void board_complete_move(const struct chess_board *board, struct chess_move *mov
     int possible_cols[16];
     int possible_moves = 0;
 
-    for (int from_row = 0; from_row < BOARD_SIZE; ++from_row)
+    for (int from_row = 0; from_row < BOARD_SIZE; from_row++)
     {
-        for (int from_col = 0; from_col < BOARD_SIZE; ++from_col)
+        for (int from_col = 0; from_col < BOARD_SIZE; from_col++)
         {
             const struct square *source_square = &board->squares[from_row][from_col]; // current square
             if (!source_square->has_piece)
@@ -1001,7 +1001,6 @@ void board_recommend_move(const struct chess_board *board, struct chess_move *re
 
 void board_summarize(const struct chess_board *board)
 {
-    board_print(board);
     if (board_in_checkmate(board))
     {
         enum chess_player loser = board->next_move_player;
